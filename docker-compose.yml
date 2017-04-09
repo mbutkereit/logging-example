@@ -1,0 +1,40 @@
+version: '2'
+services:
+  fluentd:
+    build: ./fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links:
+      - "elasticsearch"
+    ports:
+      - "42185:42185"
+      - "42185:42185/udp"
+      - "24224:24224"
+      - "24224:24224/udp"
+
+  elasticsearch:
+    image: elasticsearch
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: kibana
+    links:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
+
+  grafana:
+     image: grafana/grafana
+     links:
+      - "elasticsearch"
+     ports:
+      - "3000:3000"
+
+  rsyslogd:
+      image: voxxit/rsyslog
+      volumes:
+        - ./syslog/rsyslog.conf:/etc/rsyslog.conf
+      ports:
+        - "514:514"
+        - "514:514/udp"
